@@ -17,6 +17,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      title: 'BLUE',
+      theme: ThemeData(
+          primaryColor: Colors.blue
+      ),
       home: MyPage(),
     );
   }
@@ -49,7 +53,7 @@ class Authentication extends StatelessWidget {
                 child: AspectRatio(
                   aspectRatio: 1,
                   child: Image(
-                    image: AssetImage('image/chef.gif'),
+                    image: AssetImage('images/img.png'),
                   ),
                 ),
               );
