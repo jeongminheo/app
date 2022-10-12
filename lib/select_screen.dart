@@ -44,16 +44,24 @@ class _SelectScreenState extends State<SelectScreen> {
           return ListView.builder(
             itemCount: docs.length ,
             itemBuilder: (context, index){
-              return Container(
+              return DataTable(
+                  columns: [DataColumn(label: Text('디바이스ID')),DataColumn(label: Text('날짜')),DataColumn(label: Text('측정치')),],
+                  rows: [DataRow(cells:[
+              DataCell(Text(docs[index]['deviceId'])),
+              DataCell(Text(docs[index]['logDate'])),
+              DataCell(Text(docs[index]['score'])),])
+                  ]);
+                /*Container(
                 padding: EdgeInsets.all(8.0),
                 child: Text(docs[index]['deviceId'],
                 style: TextStyle(fontSize: 20.0),
-                ),
-              );
+                ),,
+              );*/
             },
           );
         },
       )
+
     );
   }
 }
