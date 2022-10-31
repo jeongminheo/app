@@ -1,86 +1,93 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
-/*import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutterfire_ui/auth.dart';*/
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter_apk/register.dart';
+import 'package:get/get.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-
 import 'select_screen.dart';
+import 'package:flutter_apk/select_screen.dart';
+import 'register.dart';
 
-/*void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  runApp(MyApp());
-}*/
 
-Future<Post> fetchPost() async {
-  final response =
-  await http.get(Uri.parse("https://169.254.234.45:8000/user/register"));
-  if (response.statusCode == 200) {
-    return Post.fromJSon(json.decode(response.body));
-  }
-  else {
-    throw Exception('Failed to load post');
-  }
-}
 
-class Post{
-  final String? Token;
-  Post({this.Token});
+class Post {
+  final bool? success;
+  final String? token;
 
-  factory Post.fromJSon(Map<String,dynamic> json){
+  Post({this.success,this.token});
+
+  factory Post.fromJson(Map<dynamic,dynamic> json){
     return Post(
-      Token: json['Token']
-    );
+        success : json['success'],
+        token : json['token'] );
   }
 
-}
+  Map <dynamic, dynamic> toJson() =>
+      {
+        'success':success,
+        'token':token,
+      };
+
+  }
+
+
+
 void main() => runApp(MyApp());
 
-class MyApp extends StatefulWidget {
-  MyApp({Key? key}) : super(key: key);
+class MyApp extends StatelessWidget {
+  Widget build(BuildContext context){return MaterialApp(
+    title:'BULE',
+    home: new Homescreen(),);
+  }
 
-  @override
-  _MyAppState createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
-  Future<Post>? post;
+class Homescreen extends StatefulWidget{
+
+  @override
+  Homescreen({Key? key}) : super(key: key);
+
+
+  _HomescreenState createState() => _HomescreenState();
+}
+
+class _HomescreenState extends State<Homescreen> {
+  Future<List<dynamic>>? post;
   final _formKey = GlobalKey<FormState>();
   String? userId;
   String? userPassword;
+  var userList;
+  var token;
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies()  {
+    super.didChangeDependencies() ;
     post= fetchPost();
   }
 
-  Future<Post> fetchPost() async{
+  Future<List<dynamic>> fetchPost() async{
   Map data={'userId':userId,'userpwd':userPassword};
   var body=json.encode(data);
     final response=
-        await http.post(Uri.parse('http://192.168.0.8:8000/user/login'),
+        await http.post(Uri.parse('http://121.188.98.211:1237/user/login'),
             headers:{'Content-Type':'application/json'},body:body);
 
     if(response.statusCode==200){
-      return Post.fromJSon(json.decode(response.body));
-
+      Map parsed = jsonDecode(response.body);
+      var user = Post.fromJson(parsed);
+       List<String> list =['${user.success}','${user.token}'];
+      return await list;
     }
+
     else{ throw Exception('Failed to load sheet');
     }
-
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        title: 'Fetch Data Example',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
-        home: Scaffold(
+    return Scaffold(
         appBar: AppBar(
         title: Text('Login'),),
     body:SingleChildScrollView(
@@ -148,20 +155,26 @@ class _MyAppState extends State<MyApp> {
              ElevatedButton(
                       child: Icon(Icons.arrow_forward, color: Colors.white,),
                       onPressed:(){
-                        FutureBuilder<Post>(
-                          future: post,
-                          builder: (context,AsyncSnapshot snapshot) {
-                            if (snapshot.hasData) {
-                              return Text(snapshot.data!.deviceId);
-                            } else if (snapshot.hasError) {
-                              return Text("${snapshot.error}");
-                            }
-
-                            // 기본적으로 로딩 Spinner를 보여줍니다.
-                            return CircularProgressIndicator();
-                          },
-                        );
-                      },)
+                        List<dynamic> list =[];
+                        fetchPost().then((value) {
+                          setState(() {
+                            userList = value;
+                          });
+                          var token = userList[1];
+                          if(userList[0]=='true'){
+                            Navigator.push(context,MaterialPageRoute(builder: (BuildContext context)=> SelectScreen(token)));
+                            ;
+                          }
+                          else{Fluttertoast.showToast(msg: 'error');}
+                        });
+                      }
+             ),
+                ElevatedButton(
+                  child: const Text('Sign Up'),
+                  onPressed:(){
+                    Navigator.push(context,MaterialPageRoute(builder: (BuildContext context)=> Signup()));
+                      },
+                    )
           ]
           ),
                ),
@@ -171,66 +184,6 @@ class _MyAppState extends State<MyApp> {
       )
 
       ),
-      ),
-    );
-
+      );
 }
 }
-
-/*class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'BLUE',
-      theme: ThemeData(
-          primaryColor: Colors.blue
-      ),
-      home: MyPage(),
-    );
-  }
-}
-
-
-class MyPage extends StatelessWidget {
-  const MyPage({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Authentication(),
-    );
-  }
-}
-
-
-class Authentication extends StatelessWidget {
-  const Authentication({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder(
-      stream: FirebaseAuth.instance.authStateChanges(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return SignInScreen(
-            headerBuilder: (context, constraints, double) {
-              return Padding(
-                padding: EdgeInsets.all(20),
-                child: AspectRatio(
-                  aspectRatio: 1,
-                  child: Image(
-                    image: AssetImage('images/img.png'),
-                  ),
-                ),
-              );
-            },
-            providerConfigs: [EmailProviderConfiguration()],
-          );
-        }
-        return SelectScreen();
-      },
-    );
-  }
-}*/

@@ -2,15 +2,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:convert';
-/*import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutterfire_ui/auth.dart';*/
 
 import 'package:flutter/material.dart';
 import 'package:flutter_apk/main.dart';
 
 
-/*class SelectScreen extends StatefulWidget {
-  const SelectScreen({Key? key}) : super(key: key);
+class SelectScreen extends StatefulWidget {
+  final token;
+ /*const SelectScreen({Key? key}) : super(key: key);*/
+  const SelectScreen(this.token);
 
   @override
   _SelectScreenState createState() => _SelectScreenState();
@@ -20,34 +20,15 @@ class _SelectScreenState extends State<SelectScreen> {
 
  @override
   Widget build(BuildContext context) {
-    /*DocumentReference data= test.doc['devicdId'];*/
     return Scaffold(
       appBar: AppBar(
-        title: Text('select Screen'), centerTitle: true,
-        actions: [ IconButton(
-            icon: Icon(
-              Icons.exit_to_app_sharp,
-              color: Colors.white,
-            ),
-            onPressed: () {
-              FirebaseAuth.instance.signOut();
-            },
-          )
-        ],StreamBuilder(
-        stream: FirebaseFirestore.instance.collection('test/test1doc/data').snapshots(),
-        builder: (BuildContext context,
-            AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot){
-         if(snapshot.connectionState == ConnectionState.waiting){
-           return Center(
-             child:CircularProgressIndicator(),
-           );
-         }
-
-          final docs= snapshot.data!.docs;
-          return ListView.builder(
-            itemCount: docs.length ,
-            itemBuilder: (context, index){
-              return DataTable(
+        title: Text('select Screen'),centerTitle:true),
+        body:SingleChildScrollView(
+        child:Column(
+          children: [Text('${widget.token}')],
+        ),
+      ),
+            /*  return DataTable(
                   columns: [DataColumn(label: Text('디바이스ID')),DataColumn(label: Text('날짜')),DataColumn(label: Text('측정치')),],
                   rows: [DataRow(cells:[
               DataCell(Text(docs[index]['deviceId'])),
@@ -64,9 +45,8 @@ class _SelectScreenState extends State<SelectScreen> {
           );
         },
       )
+*/
+    );
 
-    );
-   ),
-    );
   }
-}*/
+}
