@@ -39,7 +39,7 @@ dependencies:
   google_sign_in: "^5.4.2"
   http: ^0.13.5
   fluttertoast: ^8.1.1
-
+  vertical_barchart: ^2.0.0+2
 
 
   # The following adds the Cupertino Icons font to your application.
